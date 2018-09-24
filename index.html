@@ -72,7 +72,7 @@ window.onload = function(){
     aElms[i] = aElm;
   }
 
-  var connection = new WebSocket('ws://twitter-search:8080/ws');
+  var connection = new WebSocket('ws://twitter-search.inajob.tk/ws');
   // When the connection is open, send some data to the server
   connection.onopen = function () {
     connection.send('Ping'); // Send the message 'Ping' to the server

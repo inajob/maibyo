@@ -6,6 +6,9 @@ body {
   background-color: #669;
   color: white;
 }
+a{
+  color:white;
+}
 h2{
 color: #505050;
 padding: 0.5em;
@@ -22,6 +25,9 @@ margin-right: 8px;
 .margin{
   margin:2em;
 }
+.tar{
+  text-align:right;
+}
 #frequent img{
   width: 100px;
   height: 100px;
@@ -36,12 +42,14 @@ margin-right: 8px;
 <h1>Twitter Trend Image Stream</h1>
 <h2>今話題の画像</h2>
 <div id="images" class="margin"></div>
-<h2>今投稿された画像</h2>
-<div class="margin">
+<h2>最近の画像</h2>
+<div id="frequent" class="margin">
 <img id ="img" />
 </div>
-<h2>最近の画像</h2>
-<div id="frequent" class="margin"></div>
+<hr>
+<div class="tar">
+つくったひと： <a href="http://twitter.com/ina_ani">@ina_ani</a><a href="https://twitter.com/ina_ani" class="twitter-follow-button" data-show-count="false">Follow @ina_ani</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+</div>
 
 <script>
 
@@ -50,7 +58,7 @@ var imgElms = [];
 var aElms = [];
 var imgIndex = 0;
 var MAXFREQIMAGE = 24
-var MAXIMAGE = 30
+var MAXIMAGE = 40
 
 window.onload = function(){
   var frequentQueue = document.getElementById("frequent");

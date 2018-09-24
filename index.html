@@ -93,7 +93,7 @@ window.onload = function(){
     console.log('Server: ' + e.data);
     var obj = JSON.parse(e.data);
     if(obj.type == "url"){
-      obj.url += ":thumb"
+      obj.rank.url += ":thumb"
       
       if(obj.count <= 3){return} // check only one shot
       if(obj.retweet <= 5){return} // check only one shot

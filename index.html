@@ -67,6 +67,8 @@ margin-right: 8px;
 <div id="frequent" class="margin">
 <img id ="img" />
 </div>
+<h2>今日話題の画像</h2>
+<div id="today" class="margin box"></div>
 <hr>
 <div class="tar">
 つくったひと： <a href="http://twitter.com/ina_ani">@ina_ani</a><a href="https://twitter.com/ina_ani" class="twitter-follow-button" data-show-count="false">Follow @ina_ani</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
@@ -78,9 +80,33 @@ var frequentImgElms = [];
 var imgElms = [];
 var aElms = [];
 var elms = [];
+var todayElms = [];
 var imgIndex = 0;
 var MAXFREQIMAGE = 24
 var MAXIMAGE = 28
+
+function createPiece(){
+  var divElm = document.createElement("div");
+  var elm = document.createElement("img");
+  var aElm = document.createElement("a");
+  var rtElm = document.createElement("span");
+
+  divElm.className = "piece";
+  rtElm.appendChild(document.createTextNode("0RT"));
+
+  var ret = {
+    a: aElm,
+    img: elm,
+    div: divElm,
+    rt: rtElm,
+  }
+  aElm.target = "_blank";
+  aElm.appendChild(elm);
+  aElm.appendChild(rtElm);
+
+  divElm.appendChild(aElm);
+  return ret;
+}
 
 window.onload = function(){
   var frequentQueue = document.getElementById("frequent");
@@ -93,27 +119,13 @@ window.onload = function(){
 
   // setup image element
   var images = document.getElementById("images");
+  var todayImages = document.getElementById("today");
   for(var i = 0; i < MAXIMAGE; i ++){
-    var divElm = document.createElement("div");
-    var elm = document.createElement("img");
-    var aElm = document.createElement("a");
-    var rtElm = document.createElement("span");
+    elms[i] = createPiece();
+    images.appendChild(elms[i].div);
 
-    divElm.className = "piece";
-    rtElm.appendChild(document.createTextNode("0RT"));
-
-    elms[i] = {
-      a: aElm,
-      img: elm,
-      div: divElm,
-      rt: rtElm,
-    }
-    aElm.target = "_blank";
-    aElm.appendChild(elm);
-    aElm.appendChild(rtElm);
-
-    divElm.appendChild(aElm);
-    images.appendChild(divElm);
+    todayElms[i] = createPiece();
+    todayImages.appendChild(todayElms[i].div);
   }
 
   var connection = new WebSocket('ws://twitter-search.inajob.tk/ws');
@@ -175,6 +187,16 @@ window.onload = function(){
         elms[i].rt.innerHTML = e.retweet + "RT";
         index ++;
       });
+      index = 0;
+      obj.longRanking.forEach(function(e, i){
+        if(e.retweet <= 5){return;}
+        if(index >= MAXIMAGE){return;}
+        todayElms[i].img.src = e.url + ':thumb'
+        todayElms[i].a.href = e.twit
+        todayElms[i].rt.innerHTML = e.retweet + "RT";
+        index ++;
+      });
+ 
     }
   };
 

@@ -22,6 +22,10 @@ content: '●';
 color: #669;
 margin-right: 8px;
 }
+.box{
+  display: flex;
+  flex-wrap: wrap;
+}
 .margin{
   margin:2em;
 }
@@ -36,12 +40,29 @@ margin-right: 8px;
   width: 100px;
   height: 100px;
 }
+.piece{
+  position: relative;
+  float: left;
+  margin:0.2em;
+  border: solid 3px white;
+}
+.piece img{
+  width: 160px;
+  height: 160px;
+}
+.piece span{
+  position: absolute;
+  bottom:0px;
+  right: 0px;
+  background-color: blue;
+  color: white;
+}
 </style>
 </head>
 <body>
 <h1>Twitter Trend Image Stream</h1>
 <h2>今話題の画像</h2>
-<div id="images" class="margin"></div>
+<div id="images" class="margin box"></div>
 <h2>最近の画像</h2>
 <div id="frequent" class="margin">
 <img id ="img" />
@@ -56,9 +77,10 @@ margin-right: 8px;
 var frequentImgElms = [];
 var imgElms = [];
 var aElms = [];
+var elms = [];
 var imgIndex = 0;
 var MAXFREQIMAGE = 24
-var MAXIMAGE = 40
+var MAXIMAGE = 28
 
 window.onload = function(){
   var frequentQueue = document.getElementById("frequent");
@@ -72,13 +94,26 @@ window.onload = function(){
   // setup image element
   var images = document.getElementById("images");
   for(var i = 0; i < MAXIMAGE; i ++){
+    var divElm = document.createElement("div");
     var elm = document.createElement("img");
     var aElm = document.createElement("a");
+    var rtElm = document.createElement("span");
+
+    divElm.className = "piece";
+    rtElm.appendChild(document.createTextNode("0RT"));
+
+    elms[i] = {
+      a: aElm,
+      img: elm,
+      div: divElm,
+      rt: rtElm,
+    }
     aElm.target = "_blank";
     aElm.appendChild(elm);
-    images.appendChild(aElm);
-    imgElms[i] = elm;
-    aElms[i] = aElm;
+    aElm.appendChild(rtElm);
+
+    divElm.appendChild(aElm);
+    images.appendChild(divElm);
   }
 
   var connection = new WebSocket('ws://twitter-search.inajob.tk/ws');
@@ -104,7 +139,7 @@ window.onload = function(){
       obj.rank.url += ":thumb"
       
       if(obj.count <= 3){return} // check only one shot
-      if(obj.retweet <= 5){return} // check only one shot
+      if(obj.retweet <= 3){return} // check only one shot
       var flag = false;
       frequentImgElms.forEach(function(e){
         if(e.src == obj.rank.url){
@@ -135,8 +170,9 @@ window.onload = function(){
       obj.ranking.forEach(function(e, i){
         if(e.retweet <= 5){return;}
         if(index >= MAXIMAGE){return;}
-        imgElms[i].src = e.url + ':thumb'
-        aElms[i].href = e.twit
+        elms[i].img.src = e.url + ':thumb'
+        elms[i].a.href = e.twit
+        elms[i].rt.innerHTML = e.retweet + "RT";
         index ++;
       });
     }

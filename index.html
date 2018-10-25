@@ -129,6 +129,7 @@ window.onload = function(){
   }
 
   var connection = new WebSocket('ws://twitter-search.inajob.tk/ws');
+  //var connection = new WebSocket('ws://localhost:8088/ws');
   // When the connection is open, send some data to the server
   connection.onopen = function () {
     connection.send('Ping'); // Send the message 'Ping' to the server
@@ -143,9 +144,18 @@ window.onload = function(){
     console.log('WebSocket Error ' + error);
   };
 
+  function extractImage(t){
+    console.log("extact image",t, t.image_urls)
+    if(t.image_urls != null && t.image_urls.length > 0){
+      console.log(t.image_urls[0])
+      return t.image_urls[0]
+    }
+    return "";
+  }
+
   // Log messages from the server
   connection.onmessage = function (e) {
-    console.log('Server: ' + e.data);
+    //console.log('Server: ' + e.data);
     var obj = JSON.parse(e.data);
     if(obj.type == "url"){
       obj.rank.url += ":thumb"
@@ -182,18 +192,20 @@ window.onload = function(){
       obj.ranking.forEach(function(e, i){
         if(e.retweet <= 5){return;}
         if(index >= MAXIMAGE){return;}
-        elms[i].img.src = e.url + ':thumb'
-        elms[i].a.href = e.twit
-        elms[i].rt.innerHTML = e.retweet + "RT";
+        if(extractImage(e)==""){return;}
+        elms[index].img.src = extractImage(e) + ':thumb'
+        elms[index].a.href = e.twit
+        elms[index].rt.innerHTML = e.retweet + "RT";
         index ++;
       });
       index = 0;
       obj.longRanking.forEach(function(e, i){
         if(e.retweet <= 5){return;}
         if(index >= MAXIMAGE){return;}
-        todayElms[i].img.src = e.url + ':thumb'
-        todayElms[i].a.href = e.twit
-        todayElms[i].rt.innerHTML = e.retweet + "RT";
+        if(extractImage(e)==""){return;}
+        todayElms[index].img.src = extractImage(e) + ':thumb'
+        todayElms[index].a.href = e.twit
+        todayElms[index].rt.innerHTML = e.retweet + "RT";
         index ++;
       });
  

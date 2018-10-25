@@ -63,12 +63,16 @@ margin-right: 8px;
 <h1>Twitter Trend Image Stream</h1>
 <h2>今話題の画像</h2>
 <div id="images" class="margin box"></div>
+<h2>今話題のURL</h2>
+<div id="urls" class="margin box"></div>
 <h2>最近の画像</h2>
 <div id="frequent" class="margin">
 <img id ="img" />
 </div>
 <h2>今日話題の画像</h2>
 <div id="today" class="margin box"></div>
+<h2>今日話題のURL</h2>
+<div id="today-urls" class="margin box"></div>
 <hr>
 <div class="tar">
 つくったひと： <a href="http://twitter.com/ina_ani">@ina_ani</a><a href="https://twitter.com/ina_ani" class="twitter-follow-button" data-show-count="false">Follow @ina_ani</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
@@ -80,7 +84,9 @@ var frequentImgElms = [];
 var imgElms = [];
 var aElms = [];
 var elms = [];
+var urlElms = [];
 var todayElms = [];
+var todayUrlElms = [];
 var imgIndex = 0;
 var MAXFREQIMAGE = 24
 var MAXIMAGE = 28
@@ -120,12 +126,20 @@ window.onload = function(){
   // setup image element
   var images = document.getElementById("images");
   var todayImages = document.getElementById("today");
+  var urls = document.getElementById("urls");
+  var todayUrls = document.getElementById("today-urls");
   for(var i = 0; i < MAXIMAGE; i ++){
     elms[i] = createPiece();
     images.appendChild(elms[i].div);
 
+    urlElms[i] = createPiece();
+    urls.appendChild(urlElms[i].div);
+
     todayElms[i] = createPiece();
     todayImages.appendChild(todayElms[i].div);
+
+    todayUrlElms[i] = createPiece();
+    todayUrls.appendChild(todayUrlElms[i].div);
   }
 
   var connection = new WebSocket('ws://twitter-search.inajob.tk/ws');
@@ -199,6 +213,17 @@ window.onload = function(){
         index ++;
       });
       index = 0;
+      obj.urlRanking.forEach(function(e, i){
+        if(e.retweet <= 5){return;}
+        if(index >= MAXIMAGE){return;}
+        if(extractImage(e)==""){return;}
+        urlElms[index].img.src = extractImage(e) + ':thumb'
+        urlElms[index].a.href = e.twit
+        urlElms[index].rt.innerHTML = e.retweet + "RT";
+        index ++;
+      });
+ 
+      index = 0;
       obj.longRanking.forEach(function(e, i){
         if(e.retweet <= 5){return;}
         if(index >= MAXIMAGE){return;}
@@ -208,6 +233,17 @@ window.onload = function(){
         todayElms[index].rt.innerHTML = e.retweet + "RT";
         index ++;
       });
+      index = 0;
+      obj.urlLongRanking.forEach(function(e, i){
+        if(e.retweet <= 5){return;}
+        if(index >= MAXIMAGE){return;}
+        if(extractImage(e)==""){return;}
+        todayUrlElms[index].img.src = extractImage(e) + ':thumb'
+        todayUrlElms[index].a.href = e.twit
+        todayUrlElms[index].rt.innerHTML = e.retweet + "RT";
+        index ++;
+      });
+
  
     }
   };

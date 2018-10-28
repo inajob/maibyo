@@ -1,6 +1,17 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<title>毎秒新聞</title>
+<meta property="og:title" content="毎秒新聞" />
+<meta property="og:type" content=" website" />
+<meta property="og:url" content="http://web.inajob.tk/maibyo/" />
+<meta property="og:image" content="http://web.inajob.tk/maibyo/logo.png" />
+<meta property="og:site_name" content="毎秒新聞" />
+<meta property="og:description" content="今の流行画像を見ることができるWebサービスです" />
+<meta name="twitter:card" content=" summary" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+
+
 <style>
 body {
   background-color: #669;
@@ -45,29 +56,56 @@ margin-right: 8px;
   float: left;
   margin:0.2em;
   border: solid 3px white;
+  font-size: x-small;
+  background-color: #779;
 }
-.piece img{
+.piece .inner{
   width: 160px;
   height: 160px;
+  background-size: cover;
+  background-position: center center;
 }
-.piece span{
+.piece .text{
+  background-color:rgba(0,0,0,0.5);
+  position: absolute;
+  bottom: 0px;
+}
+.piece a{
+  text-decoration: none;
+}
+.piece .retweet{
   position: absolute;
   bottom:0px;
   right: 0px;
   background-color: blue;
   color: white;
 }
+.piece .twitter-profile-img{
+  width:16px;
+  height:16px;
+}
+.piece .head{
+  overflow: hidden;
+  width: 160px;
+  height:16px;
+}
+.piece .head span{
+  vertical-align:top;
+}
+
 </style>
 </head>
 <body>
-<h1>Twitter Trend Image Stream</h1>
-<h2>今話題の画像</h2>
-<div id="images" class="margin box"></div>
+<h1>毎秒新聞</h1>
+姉妹サービス： <a href="http://page.inajob.tk/maiji/">毎時新聞</a>
 <h2>最近の画像</h2>
 <div id="frequent" class="margin">
 <img id ="img" />
 </div>
-<h2>今日話題の画像</h2>
+
+<h2>ここ1時間の話題の画像</h2>
+<div id="images" class="margin box"></div>
+<h2>ここ24時間の話題の画像</h2>
 <div id="today" class="margin box"></div>
 <hr>
 <div class="tar">
@@ -85,36 +123,85 @@ var imgIndex = 0;
 var MAXFREQIMAGE = 24
 var MAXIMAGE = 28
 
+function jsonp(name, src, f){
+  window[name] = function(data){
+    f(data);
+  }
+  var script = document.createElement("script");
+  script.type = "text/javascript";
+  script.async = true;
+  script.src = src;
+  document.body.appendChild(script);
+}
+
+function extractImage(t){
+  console.log("extact image",t, t.image_urls)
+  if(t.image_urls != null && t.image_urls.length > 0){
+    console.log(t.image_urls[0])
+    return t.image_urls[0]
+  }
+  return "";
+}
+
 function createPiece(){
   var divElm = document.createElement("div");
-  var elm = document.createElement("img");
   var aElm = document.createElement("a");
   var rtElm = document.createElement("span");
+  var innerElm = document.createElement("div");
+  var textElm = document.createElement("div");
+  var headElm = document.createElement("div");
 
   divElm.className = "piece";
+  innerElm.className = "inner";
+  textElm.className = "text";
+  headElm.className = "head";
+  rtElm.className = "retweet";
   rtElm.appendChild(document.createTextNode("0RT"));
 
   var ret = {
     a: aElm,
-    img: elm,
+    inner: innerElm,
+    text: textElm,
+    head: headElm,
     div: divElm,
     rt: rtElm,
   }
   aElm.target = "_blank";
-  aElm.appendChild(elm);
+  aElm.appendChild(headElm);
+  aElm.appendChild(innerElm);
   aElm.appendChild(rtElm);
+  innerElm.appendChild(textElm);
 
   divElm.appendChild(aElm);
   return ret;
+}
+
+function pushPiece(elm, index, e){
+  elm[index].inner.style.backgroundImage = 'url(' + extractImage(e) + ':small)';
+  elm[index].a.href = e.twit
+  elm[index].rt.innerHTML = e.retweet + "RT";
+
+  var name = "callback_" + Math.random().toString(36).slice(-8);
+  var url = "https://api.twitter.com/1/statuses/oembed.json";
+  url += "?omit_script=true&url="+encodeURIComponent(e.twit)+'&callback=' + name;
+  jsonp(name, url, function(data){
+    console.log(e,data)
+    var m = data.html.match(/<p lang=".*" dir="ltr">(.*?)<\/p>/);
+    var twit = m[1].replace(/<a href="https:\/\/[^>"]*">pic.twitter.com\/[^<]*<\/a>/,"");
+    elm[index].text.innerHTML = twit;
+    elm[index].head.innerHTML = '<img class="twitter-profile-img" src="' + e.profile_image + '">' + '<a href="' + data.author_url + '" target="_blank"><span>' + data.author_name + '</span></a>';
+  });
 }
 
 window.onload = function(){
   var frequentQueue = document.getElementById("frequent");
   for(var i = 0; i < MAXFREQIMAGE; i ++){
     var elm = document.createElement("img");
+    var aElm = document.createElement("a");
     elm.style.border="solid 3px white"
-    frequentQueue.appendChild(elm);
-    frequentImgElms[i] = elm;
+    aElm.appendChild(elm);
+    frequentQueue.appendChild(aElm);
+    frequentImgElms[i] = {a:aElm,img:elm};
   }
 
   // setup image element
@@ -144,14 +231,6 @@ window.onload = function(){
     console.log('WebSocket Error ' + error);
   };
 
-  function extractImage(t){
-    console.log("extact image",t, t.image_urls)
-    if(t.image_urls != null && t.image_urls.length > 0){
-      console.log(t.image_urls[0])
-      return t.image_urls[0]
-    }
-    return "";
-  }
 
   // Log messages from the server
   connection.onmessage = function (e) {
@@ -159,33 +238,33 @@ window.onload = function(){
     var obj = JSON.parse(e.data);
     if(obj.type == "url"){
       obj.rank.url += ":thumb"
-      
+
       if(obj.count <= 3){return} // check only one shot
       if(obj.retweet <= 3){return} // check only one shot
+      if(extractImage(obj.rank)==""){return;}
       var flag = false;
       frequentImgElms.forEach(function(e){
-        if(e.src == obj.rank.url){
+        if(e.img.src == obj.rank.url){
           flag = true;
         }
       })
       if(flag){return} // check already listed in queue
-      
+
       var elm = document.getElementById("img");
       elm.src = obj.rank.url;
-      
-      //var img = document.createElement("img");
-      //img.src = obj.rank.url;
-      
-      frequentImgElms[imgIndex].src = obj.rank.url;
-      
+
+      frequentImgElms[imgIndex].img.src = obj.rank.url;
+      frequentImgElms[imgIndex].a.href = obj.rank.twit;
+      frequentImgElms[imgIndex].a.target = "_blank";
+
       frequentImgElms.forEach(function(e, i){
         if(i != imgIndex){
-          e.style.border = "solid 3px white";
+          e.img.style.border = "solid 3px white";
         }else{
-          e.style.border = "dotted 3px blue";
+          e.img.style.border = "dashed 3px yellow";
         }
       });
-      
+
       imgIndex = (imgIndex + 1) % MAXFREQIMAGE;
     }else if(obj.type == "ranking"){
       var index = 0;
@@ -193,9 +272,10 @@ window.onload = function(){
         if(e.retweet <= 5){return;}
         if(index >= MAXIMAGE){return;}
         if(extractImage(e)==""){return;}
-        elms[index].img.src = extractImage(e) + ':thumb'
-        elms[index].a.href = e.twit
-        elms[index].rt.innerHTML = e.retweet + "RT";
+        pushPiece(elms, index, e)
+        //elms[index].img.src = extractImage(e) + ':thumb'
+        //elms[index].a.href = e.twit
+        //elms[index].rt.innerHTML = e.retweet + "RT";
         index ++;
       });
       index = 0;
@@ -203,9 +283,10 @@ window.onload = function(){
         if(e.retweet <= 5){return;}
         if(index >= MAXIMAGE){return;}
         if(extractImage(e)==""){return;}
-        todayElms[index].img.src = extractImage(e) + ':thumb'
-        todayElms[index].a.href = e.twit
-        todayElms[index].rt.innerHTML = e.retweet + "RT";
+        pushPiece(todayElms, index, e)
+        //todayElms[index].img.src = extractImage(e) + ':thumb'
+        //todayElms[index].a.href = e.twit
+        //todayElms[index].rt.innerHTML = e.retweet + "RT";
         index ++;
       });
  

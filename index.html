@@ -4,8 +4,8 @@
 <title>毎秒新聞</title>
 <meta property="og:title" content="毎秒新聞" />
 <meta property="og:type" content=" website" />
-<meta property="og:url" content="http://web.inajob.tk/maibyo/" />
-<meta property="og:image" content="http://web.inajob.tk/maibyo/logo.png" />
+<meta property="og:url" content="http://web.inajob.ml/maibyo/" />
+<meta property="og:image" content="http://web.inajob.ml/maibyo/logo.png" />
 <meta property="og:site_name" content="毎秒新聞" />
 <meta property="og:description" content="今の流行画像を見ることができるWebサービスです。 Twitterの「今」を見てみよう！" />
 <meta name="twitter:card" content=" summary" />
@@ -103,12 +103,12 @@ margin-right: 8px;
 </head>
 <body>
 <div class="tar">
-<a href="http://b.hatena.ne.jp/entry/web.inajob.tk/maibyo/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+<a href="http://b.hatena.ne.jp/entry/web.inajob.ml/maibyo/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
 <a href="https://twitter.com/share?hashtags=maibyo" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 </div>
 <h1>- 毎秒新聞 -</h1>
 <div class="tac">Twitterの「今」を見てみよう！</div>
-姉妹サービス： <a target="_blank" href="http://page.inajob.tk/maiji/">毎時新聞</a>
+姉妹サービス： <a target="_blank" href="http://page.inajob.ml/maiji/">毎時新聞</a>
 <h2>最近の画像</h2>
 <div id="frequent" class="margin">
 <img id ="img" />
@@ -226,7 +226,7 @@ window.onload = function(){
     todayImages.appendChild(todayElms[i].div);
   }
 
-  var connection = new WebSocket('ws://twitter-search.inajob.tk/ws');
+  var connection = new WebSocket('ws://twitter-search.inajob.ml/ws');
   //var connection = new WebSocket('ws://localhost:8088/ws');
   // When the connection is open, send some data to the server
   connection.onopen = function () {
